@@ -10,6 +10,7 @@ impl ChunkType {
     pub fn bytes(&self) -> [u8; 4] {
         self.data
     }
+
     pub fn is_valid(&self) -> bool {
         for c in self.data {
             if !c.is_ascii_alphabetic() {
@@ -19,15 +20,19 @@ impl ChunkType {
 
         self.is_reserved_bit_valid()
     }
+
     pub fn is_critical(&self) -> bool {
         self.data[0].is_ascii_uppercase()
     }
+
     pub fn is_public(&self) -> bool {
         self.data[1].is_ascii_uppercase()
     }
+
     pub fn is_reserved_bit_valid(&self) -> bool {
         self.data[2].is_ascii_uppercase()
     }
+
     pub fn is_safe_to_copy(&self) -> bool {
         self.data[3].is_ascii_lowercase()
     }

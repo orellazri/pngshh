@@ -10,32 +10,45 @@ pub struct Chunk {
     data_length: u32,
     chunk_type: ChunkType,
     data: Vec<u8>,
-    crc: u32,
 }
 
 impl Chunk {
+    pub fn new(chunk_type: ChunkType, data: Vec<u8>) -> Self {
+        Chunk {
+            data_length: data.len() as u32,
+            chunk_type,
+            data,
+        }
+    }
+
     pub fn length(&self) -> u32 {
         self.data_length
     }
+
     pub fn chunk_type(&self) -> &ChunkType {
         &self.chunk_type
     }
+
     pub fn data(&self) -> &[u8] {
         &self.data
     }
+
     pub fn crc(&self) -> u32 {
-        self.crc
+        let crc_bytes: Vec<u8> = self.chunk_type.bytes().iter().chain(self.data.iter()).into_iter().copied().collect();
+        crc::crc32::checksum_ieee(&crc_bytes)
     }
+
     pub fn data_as_string(&self) -> Result<String, Error> {
         Ok(String::from_utf8(self.data.clone()).unwrap())
     }
+
     pub fn as_bytes(&self) -> Vec<u8> {
         self.data_length
             .to_be_bytes()
             .iter()
             .chain(self.chunk_type.bytes().iter())
             .chain(self.data.iter())
-            .chain(self.crc.to_be_bytes().iter())
+            .chain(self.crc().to_be_bytes().iter())
             .copied()
             .collect()
     }
@@ -67,8 +80,14 @@ impl TryFrom<&[u8]> for Chunk {
         // Read CRC
         reader.read_exact(&mut buffer)?;
         let actual_crc = u32::from_be_bytes(buffer);
-        let thebytes: Vec<u8> = chunk_type.bytes().iter().chain(data.iter()).into_iter().copied().collect();
-        let expecetd_crc = crc::crc32::checksum_ieee(&thebytes);
+
+        // Compare CRC
+        let new = Self {
+            data_length,
+            chunk_type: chunk_type.clone(),
+            data: data.clone(),
+        };
+        let expecetd_crc = new.crc();
         if actual_crc != expecetd_crc {
             return Err(Box::from("Invalid CRC"));
         }
@@ -77,7 +96,6 @@ impl TryFrom<&[u8]> for Chunk {
             data_length,
             chunk_type,
             data,
-            crc: actual_crc,
         })
     }
 }
