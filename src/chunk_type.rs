@@ -3,7 +3,7 @@ use std::{convert::TryFrom, str::FromStr};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct ChunkType {
-    data: [u8; 4],
+    pub data: [u8; 4],
 }
 
 impl ChunkType {
