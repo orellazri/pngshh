@@ -7,9 +7,9 @@ use std::{
 use crate::{chunk_type::ChunkType, Error};
 
 pub struct Chunk {
-    data_length: u32,
-    chunk_type: ChunkType,
-    data: Vec<u8>,
+    pub data_length: u32,
+    pub chunk_type: ChunkType,
+    pub data: Vec<u8>,
 }
 
 impl Chunk {
