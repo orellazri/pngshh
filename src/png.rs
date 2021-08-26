@@ -14,10 +14,6 @@ pub struct Png {
 impl Png {
     pub const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
-    pub fn new() -> Self {
-        todo!()
-    }
-
     pub fn from_chunks(chunks: Vec<Chunk>) -> Self {
         Png { chunks }
     }
@@ -37,7 +33,7 @@ impl Png {
     }
 
     pub fn header(&self) -> &[u8; 8] {
-        todo!()
+        &Png::STANDARD_HEADER
     }
 
     pub fn chunks(&self) -> &[Chunk] {
@@ -104,7 +100,11 @@ impl TryFrom<&[u8]> for Png {
 
 impl fmt::Display for Png {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        todo!()
+        for c in self.chunks() {
+            writeln!(f, "{}", c)?;
+        }
+
+        Ok(())
     }
 }
 
@@ -117,13 +117,11 @@ mod tests {
     use std::str::FromStr;
 
     fn testing_chunks() -> Vec<Chunk> {
-        let mut chunks = Vec::new();
-
-        chunks.push(chunk_from_strings("FrSt", "I am the first chunk").unwrap());
-        chunks.push(chunk_from_strings("miDl", "I am another chunk").unwrap());
-        chunks.push(chunk_from_strings("LASt", "I am the last chunk").unwrap());
-
-        chunks
+        vec![
+            chunk_from_strings("FrSt", "I am the first chunk").unwrap(),
+            chunk_from_strings("miDl", "I am another chunk").unwrap(),
+            chunk_from_strings("LASt", "I am the last chunk").unwrap(),
+        ]
     }
 
     fn testing_png() -> Png {
@@ -132,8 +130,6 @@ mod tests {
     }
 
     fn chunk_from_strings(chunk_type: &str, data: &str) -> Result<Chunk, Error> {
-        use std::str::FromStr;
-
         let chunk_type = ChunkType::from_str(chunk_type)?;
         let data: Vec<u8> = data.bytes().collect();
 
@@ -236,16 +232,16 @@ mod tests {
         assert_eq!(actual, expected);
     }
 
-    // #[test]
-    // fn test_png_trait_impls() {
-    //     let chunk_bytes: Vec<u8> = testing_chunks().into_iter().flat_map(|chunk| chunk.as_bytes()).collect();
+    #[test]
+    fn test_png_trait_impls() {
+        let chunk_bytes: Vec<u8> = testing_chunks().into_iter().flat_map(|chunk| chunk.as_bytes()).collect();
 
-    //     let bytes: Vec<u8> = Png::STANDARD_HEADER.iter().chain(chunk_bytes.iter()).copied().collect();
+        let bytes: Vec<u8> = Png::STANDARD_HEADER.iter().chain(chunk_bytes.iter()).copied().collect();
 
-    //     let png: Png = TryFrom::try_from(bytes.as_ref()).unwrap();
+        let png: Png = TryFrom::try_from(bytes.as_ref()).unwrap();
 
-    //     let _png_string = format!("{}", png);
-    // }
+        let _png_string = format!("{}", png);
+    }
 
     // This is the raw bytes for a shrunken version of the `dice.png` image on Wikipedia
     const PNG_FILE: [u8; 4803] = [
