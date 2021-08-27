@@ -1,6 +1,6 @@
 # pngshh
 
-This is a utility made in rust that can encode and decode messages from PNG files.
+This is a utility made in Rust that can encode and decode messages from PNG files.
 
 It follows the [PNG Specification, Version 1.2](http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html) document.
 
