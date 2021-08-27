@@ -34,7 +34,14 @@ impl Chunk {
     }
 
     pub fn crc(&self) -> u32 {
-        let crc_bytes: Vec<u8> = self.chunk_type.bytes().iter().chain(self.data.iter()).into_iter().copied().collect();
+        let crc_bytes: Vec<u8> = self
+            .chunk_type
+            .bytes()
+            .iter()
+            .chain(self.data.iter())
+            .into_iter()
+            .copied()
+            .collect();
         crc::crc32::checksum_ieee(&crc_bytes)
     }
 
