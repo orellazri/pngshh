@@ -61,20 +61,32 @@ fn main() -> Result<()> {
                 Some(path) => fs::write(path, png.as_bytes())?,
                 None => fs::write(&v.file_path, png.as_bytes())?,
             }
+
+            println!("Successfully encoded.");
         }
         Subcommand::Decode(v) => {
             let bytes = fs::read(&v.file_path)?;
             let png = png::Png::try_from(&bytes[..])?;
             if let Some(c) = png.chunk_by_type(str::from_utf8(&v.chunk_type.data).unwrap()) {
-                println!("{}", c.data_as_string()?);
+                println!("Decoded: {}", c.data_as_string()?);
             } else {
                 println!("Nothing found.");
             }
         }
-        Subcommand::Remove(v) => {}
-        Subcommand::Print(v) => {}
+        Subcommand::Remove(v) => {
+            let bytes = fs::read(&v.file_path)?;
+            let mut png = png::Png::try_from(&bytes[..])?;
+            png.remove_chunk(str::from_utf8(&v.chunk_type.data).unwrap())?;
+
+            println!("Successfully removed.");
+        }
+        Subcommand::Print(v) => {
+            let bytes = fs::read(&v.file_path)?;
+            let png = png::Png::try_from(&bytes[..])?;
+            println!("{}", png);
+        }
         _ => {
-            println!("Invalid subcommand")
+            println!("Invalid subcommand!")
         }
     }
 
