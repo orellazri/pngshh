@@ -1,10 +1,9 @@
 use chunk_type::ChunkType;
-use clap::{AppSettings, Clap};
-use std::{convert::TryFrom, fs, path::PathBuf};
+use clap::Clap;
+use std::{convert::TryFrom, fs, path::PathBuf, str};
 
 mod chunk;
 mod chunk_type;
-mod commands;
 mod png;
 
 pub type Error = Box<dyn std::error::Error>;
@@ -63,7 +62,15 @@ fn main() -> Result<()> {
                 None => fs::write(&v.file_path, png.as_bytes())?,
             }
         }
-        Subcommand::Decode(v) => {}
+        Subcommand::Decode(v) => {
+            let bytes = fs::read(&v.file_path)?;
+            let png = png::Png::try_from(&bytes[..])?;
+            if let Some(c) = png.chunk_by_type(str::from_utf8(&v.chunk_type.data).unwrap()) {
+                println!("{}", c.data_as_string()?);
+            } else {
+                println!("Nothing found.");
+            }
+        }
         Subcommand::Remove(v) => {}
         Subcommand::Print(v) => {}
         _ => {
