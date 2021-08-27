@@ -14,6 +14,7 @@ pub struct Png {
 impl Png {
     pub const STANDARD_HEADER: [u8; 8] = [137, 80, 78, 71, 13, 10, 26, 10];
 
+    #[allow(dead_code)]
     pub fn from_chunks(chunks: Vec<Chunk>) -> Self {
         Png { chunks }
     }
@@ -27,13 +28,13 @@ impl Png {
             .chunks
             .iter()
             .position(|c| str::from_utf8(&c.chunk_type.data).unwrap() == chunk_type)
-            .unwrap();
+            .ok_or("Could not find chunk!");
 
-        Ok(self.chunks.remove(index))
-    }
-
-    pub fn header(&self) -> &[u8; 8] {
-        &Png::STANDARD_HEADER
+        if let Ok(i) = index {
+            Ok(self.chunks.remove(i))
+        } else {
+            Err(Box::from("Could not find chunk!"))
+        }
     }
 
     pub fn chunks(&self) -> &[Chunk] {
@@ -76,7 +77,7 @@ impl TryFrom<&[u8]> for Png {
         // Read each chunk
         let mut chunks: Vec<Chunk> = Vec::new();
 
-        while let Ok(_) = reader.read_exact(&mut buffer) {
+        while reader.read_exact(&mut buffer).is_ok() {
             // Read data length
             let data_length_num: usize = u32::from_be_bytes(buffer) as usize;
 

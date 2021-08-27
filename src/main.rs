@@ -1,6 +1,6 @@
 use chunk_type::ChunkType;
 use clap::Clap;
-use std::{convert::TryFrom, fs, path::PathBuf, str};
+use std::{convert::TryFrom, fs, path::PathBuf, process, str};
 
 mod chunk;
 mod chunk_type;
@@ -76,7 +76,11 @@ fn main() -> Result<()> {
         Subcommand::Remove(v) => {
             let bytes = fs::read(&v.file_path)?;
             let mut png = png::Png::try_from(&bytes[..])?;
-            png.remove_chunk(str::from_utf8(&v.chunk_type.data).unwrap())?;
+            if png.remove_chunk(str::from_utf8(&v.chunk_type.data).unwrap()).is_err() {
+                println!("Could not remove chunk.");
+                process::exit(1);
+            }
+            fs::write(&v.file_path, png.as_bytes())?;
 
             println!("Successfully removed.");
         }
@@ -84,9 +88,6 @@ fn main() -> Result<()> {
             let bytes = fs::read(&v.file_path)?;
             let png = png::Png::try_from(&bytes[..])?;
             println!("{}", png);
-        }
-        _ => {
-            println!("Invalid subcommand!")
         }
     }
 

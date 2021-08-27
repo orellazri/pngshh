@@ -21,10 +21,12 @@ impl ChunkType {
         self.is_reserved_bit_valid()
     }
 
+    #[allow(dead_code)]
     pub fn is_critical(&self) -> bool {
         self.data[0].is_ascii_uppercase()
     }
 
+    #[allow(dead_code)]
     pub fn is_public(&self) -> bool {
         self.data[1].is_ascii_uppercase()
     }
@@ -33,6 +35,7 @@ impl ChunkType {
         self.data[2].is_ascii_uppercase()
     }
 
+    #[allow(dead_code)]
     pub fn is_safe_to_copy(&self) -> bool {
         self.data[3].is_ascii_lowercase()
     }
