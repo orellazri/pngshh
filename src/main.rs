@@ -1,6 +1,6 @@
 use chunk_type::ChunkType;
 use clap::Clap;
-use std::{convert::TryFrom, fs, path::PathBuf, process, str};
+use std::{convert::TryFrom, fs, path::PathBuf, str};
 
 mod chunk;
 mod chunk_type;
@@ -78,11 +78,10 @@ fn main() -> Result<()> {
             let mut png = png::Png::try_from(&bytes[..])?;
             if png.remove_chunk(str::from_utf8(&v.chunk_type.data).unwrap()).is_err() {
                 println!("Could not remove chunk.");
-                process::exit(1);
+            } else {
+                fs::write(&v.file_path, png.as_bytes())?;
+                println!("Successfully removed.");
             }
-            fs::write(&v.file_path, png.as_bytes())?;
-
-            println!("Successfully removed.");
         }
         Subcommand::Print(v) => {
             let bytes = fs::read(&v.file_path)?;
