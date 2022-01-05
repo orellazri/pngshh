@@ -2,7 +2,7 @@
 
 This is a utility made in Rust that can encode and decode messages in PNG files.
 
-It follows the [PNG Specification, Version 1.2](http://www.libpng.org/pub/png/spec/1.2/PNG-Structure.html) document.
+It follows the [PNG Specification, Version 1.2](http://www.libpng.org/pub/png/spec/1.2/PNG-Contents.html) document.
 
 ## Usage
 
